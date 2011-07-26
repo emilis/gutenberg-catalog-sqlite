@@ -22,7 +22,6 @@
  */
 
 // Requirements:
-var gluestick = require("gluestick");
 var ringo_strings = require("ringo/utils/strings");
 
 /**
@@ -56,7 +55,7 @@ exports.connect = function(db, table) {
     if (typeof(db) != "string" && db.get_all)
         this.DB = db;
     else
-        this.DB = gluestick.loadModule(db);
+        this.DB = require("gluestick").loadModule(db);
 
     this.TABLENAME = table;
 }
