@@ -10,7 +10,7 @@ drop table if exists books;
 create table books(
     book_id integer primary key autoincrement,
     created char(10) not null,
-    rights char(1) not null,
+    rights char(1) not null default 'C',
     mtype_id int null references multimedia_types(mtype_id) on delete set null,
     title varchar(255) null,
     data text
