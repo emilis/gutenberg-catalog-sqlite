@@ -108,7 +108,7 @@ exports.getConnection = function(conn) {
 
     if (conn == undefined) {
         conn = this.last_connection;
-        if (conn.isClosed())
+        if (conn === false || conn.isClosed())
             conn = this.connect();
     }
     return conn;

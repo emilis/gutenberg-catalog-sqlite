@@ -10,6 +10,18 @@ var objects = require("ringo/utils/objects");
 db.connect(config.DATA_DIR + "/catalog.sqlite");
 
 
+exports.begin_trans = function() {
+
+    db.query("BEGIN TRANSACTION");
+};
+
+exports.end_trans = function() {
+
+    db.query("COMMIT");
+
+};
+
+
 /**
  *
  */

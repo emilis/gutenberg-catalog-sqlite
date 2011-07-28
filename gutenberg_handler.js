@@ -1,15 +1,91 @@
 
+var dbtables = require("dbtables");
 
-var texts = [];
-var curText = false;
 
-var files = [];
-var curFile = false;
 
-var charMode = "";
+exports.path = [];
+exports.pathStr = ""
 
+
+exports.startDocument = function() {
+
+    dbtables.begin_trans();
+};
+
+exports.endDocument = function() {
+
+    dbtables.end_trans();
+
+};
 
 exports.startElement = function (namespaceURI, localName, qName, atts) {
+
+    this.path.push(qName);
+    this.pathStr = this.path.join("/");
+
+    switch (qName) {
+
+    case "pgterms:etext":
+
+        this.etext = {
+            book_id: atts.getValue("rdf:ID").replace("etext", "")
+        };
+        dbtables.books.write(false, this.etext);
+        break;
+
+    case "pgterms:file":
+
+        this.file = {
+            url: atts.getValue("rdf:about").replace("http://www.gutenberg.org", "")
+        };
+       break;
+    }
+};
+
+
+/**
+ *
+ */
+exports.endElement = function (namespaceURI, localName, qName) {
+
+    if (qName != this.path.pop()) {
+        throw Error("Last closed element does not match last opened element.");
+    }
+    this.pathStr = this.path.join("/");
+
+    switch (this.pathStr) {
+
+    case "pgterms:etext":
+    case "pgterms:file":
+
+        this.etext = false;
+        this.file = false;
+        break;
+    }
+};
+
+exports.characters = function(ch, start, length) {
+
+    var str = "" + new java.lang.String(ch, start, length);
+
+    switch (this.pathStr) {
+
+    case "pgterms:etext/dc:created":
+        this.etext.created = str;
+        break;
+
+    case "pgterms:file/dcterms:extent":
+        this.file.size = parseInt(str, 10);
+        break;
+
+    case "pgterms:file/dcterms:modified":
+        this.file.modified = str;
+        break;
+    }
+};
+
+
+/*
 
     switch (qName) {
 
@@ -49,7 +125,9 @@ exports.startElement = function (namespaceURI, localName, qName, atts) {
                 
     }
 };
+*/
 
+/*
 exports.endElement = function (namespaceURI, localName, qName) {
 
     switch (qName) {
@@ -98,6 +176,7 @@ exports.endElement = function (namespaceURI, localName, qName) {
     }
 };
 
+
 exports.characters = function(ch, start, length) {
 
     switch (charMode) {
@@ -119,5 +198,5 @@ exports.characters = function(ch, start, length) {
 exports.getFiles = function() {
     return files;
 };
-
+*/
 

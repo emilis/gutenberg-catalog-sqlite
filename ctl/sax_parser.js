@@ -34,7 +34,7 @@ exports.setFileName = function(file_name) {
 /**
  *
  */
-exports.setContentHandler(contentHandler) {
+exports.setContentHandler = function(contentHandler) {
 
     if (!contentHandler.startElement || !contentHandler.endElement || !contentHandler.characters) {
         throw Error("contentHandler needs at least startElement(), endElement() or characters() properties.");
@@ -51,9 +51,12 @@ exports.setContentHandler(contentHandler) {
  */
 exports.parse = function() {
 
-    this.file_name || throw Error("Please supply a file name before parsing.");
-    this.contentHandler || throw Error("Please supply a contentHandler before parsing.");
-
+    if (!this.file_name) {
+        throw Error("Please supply a file name before parsing.");
+    }
+    if (!this.contentHandler) {
+        throw Error("Please supply a contentHandler before parsing.");
+    }
 
     var reader = new org.xml.sax.helpers.ParserAdapter(
         new org.xml.sax.helpers.XMLReaderAdapter());

@@ -14,8 +14,8 @@ for each (var fname in fs.list(jar_dir)) {
 
 // --- Main: ---
 
-function main() {
-    return;
+exports.run = function() {
+    
     // paths:
     var data_dir = module.directory + "/data";
     var catalog_file = data_dir + "/catalog.rdf";
@@ -23,12 +23,15 @@ function main() {
 
     // vars:
     var parser = require("ctl/sax_parser");
-    var gutenberg_handler = require("gutenberg_handler")
+    var gutenberg_handler = require("gutenberg_handler");
+    gutenberg_handler.start();
 
     // parse:
     parser.setContentHandler(gutenberg_handler);
-    parser.setFileName(catalog_dile);
+    parser.setFileName(catalog_file);
     parser.parse();
+
+    gutenberg_handler.finish();
 
     print("Parsing finished.");
 }
