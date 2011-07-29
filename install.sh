@@ -2,9 +2,6 @@
 rm -rf data
 mkdir data
 
-rm -rf ringojs
-git clone git://github.com/ringo/ringojs.git
+rm -rf ringojs-0.8
+tar xzf install/ringojs-0.8.tar.gz 
 
-cd ringojs
-ant jar
-ant docs
