@@ -24,16 +24,16 @@ exports.run = function() {
     // vars:
     var parser = require("ctl/sax_parser");
     var gutenberg_handler = require("gutenberg_handler");
-    gutenberg_handler.start();
 
     // parse:
     parser.setContentHandler(gutenberg_handler);
     parser.setFileName(catalog_file);
     parser.parse();
 
-    gutenberg_handler.finish();
-
     print("Parsing finished.");
 }
 
 
+print(new Date());
+exports.run();
+print(new Date());

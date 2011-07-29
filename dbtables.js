@@ -4,6 +4,7 @@ var config = require("config");
 var db = require("ctl/DB/Sqlite");
 var dbtable = require("ctl/objectfs/dbtable");
 var objects = require("ringo/utils/objects");
+var serializable = require("ctl/objectfs/serializable");
 
 
 // Connect to DB:
@@ -29,7 +30,10 @@ function connect_table(name, methods) {
 
     methods = methods || {};
 
-    var table = objects.clone(dbtable, methods);
+    var table = objects.clone(
+        methods,
+        objects.clone(dbtable, {})
+    );
     table.connect(db, name);
 
     return table;
@@ -64,7 +68,8 @@ for each (var t in tables) {
 exports.books = connect_table("books", {
 
     fields: {
-        book_id: true,
+        id: true,
+        etext_id: true,
         created: true,
         rights: true,
         title: true,
@@ -77,17 +82,27 @@ exports.books = connect_table("books", {
         var ndata = {};
         ndata.data = data.data || {};
         for (var k in data) {
-            if (fields[k]) {
+            if (this.fields[k]) {
                 ndata[k] = data[k];
             } else {
                 ndata.data[k] = data[k];
             }
         }
+        ndata.data = JSON.stringify(ndata.data);
 
         return ndata;
+    },
+
+    unserialize: function(data) {
+
+        if (data.data) {
+            data.data = JSON.parse(data.data);
+        }
+
+        return data;
     }
 
 });
 
 
-
+serializable.upgradeExports(exports.books);
