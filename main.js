@@ -34,6 +34,8 @@ exports.run = function() {
 }
 
 
-print(new Date());
-exports.run();
-print(new Date());
+if (require.main == module) {
+    print(new Date());
+    exports.run();
+    print(new Date());
+}
