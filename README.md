@@ -12,6 +12,10 @@ This program transforms data from [Project Gutenberg](http://gutenberg.org/) [ca
 
 The resulting database will be in <code>data/catalog.sqlite</code>.
 
+### Example output:
+
+<http://emilis.info/other/gutenberg-catalog.sqlite.bz2> (22 MB)
+
 ## Requirements:
 
 - Linux or other *nix (sh,tar,wget,bunzip2)
