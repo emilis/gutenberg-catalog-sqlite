@@ -1,3 +1,22 @@
+/*
+    Copyright 2011 Emilis Dambauskas
+
+    This file is part of Gutenberg Catalog Converter to Sqlite.
+
+    Gutenberg Catalog Converter is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Gutenberg Catalog Converter is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Gutenberg Catalog Converter.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 
 // Set up require paths:
 require.paths.push(module.directory);
@@ -33,8 +52,17 @@ exports.run = function() {
     print("Parsing finished.");
 }
 
+exports.header = function() {
+
+    ["Gutenberg Catalog Converter to Sqlite  Copyright (C) 2011 Emilis Dambauskas",
+        "This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE.txt.",
+        "This is free software, and you are welcome to redistribute it under certain conditions; see LICENSE.txt for details."
+    ].map(print);
+}
+
 
 if (require.main == module) {
+    exports.header();
     print(new Date());
     exports.run();
     print(new Date());
