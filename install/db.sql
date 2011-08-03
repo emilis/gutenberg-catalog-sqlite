@@ -1,13 +1,11 @@
--- Books --
-
-drop table if exists multimedia_types;
-create table multimedia_types(
+DROP TABLE IF EXISTS multimedia_types;
+CREATE TABLE multimedia_types(
     id integer primary key autoincrement,
     name varchar(255) not null unique
 );
-
-drop table if exists books;
-create table books(
+;
+DROP TABLE IF EXISTS books;
+CREATE TABLE books(
     id integer primary key autoincrement,
     etext_id integer not null unique,
     created char(10) not null default '1970-01-01',
@@ -16,26 +14,16 @@ create table books(
     title varchar(255) null,
     data text
 );
-
-drop index if exists books_created;
-create index if not exists books_created on books(created);
-
-drop index if exists books_rights;
-create index if not exists books_rights on books(rights);
-
-
-drop table if exists language2book;
-create table language2book(
+;
+DROP TABLE IF EXISTS language2book;
+CREATE TABLE language2book(
     book_id int not null references books(id) on delete cascade,
     language varchar(3) not null,
     primary key(book_id, language)
 );
-
-
--- Files --
-
-drop table if exists files;
-create table files(
+;
+DROP TABLE IF EXISTS files;
+CREATE TABLE files(
     id integer primary key autoincrement,
     etext_id int not null references books(etext_id) on delete set null,
     size int not null,
@@ -43,90 +31,117 @@ create table files(
     charset varchar(16),
     url varchar(255) not null unique
 );
-
-drop index if exists files_modified;
-create index if not exists files_modified on files(modified);
-
-drop index if exists files_charset;
-create index if not exists files_charset on files(charset);
-
-
-
-drop table if exists file_types;
-create table file_types(
+;
+DROP TABLE IF EXISTS file_types;
+CREATE TABLE file_types(
     id integer primary key autoincrement,
     name varchar(64) not null unique
 );
-
-drop table if exists ftypes2files;
-create table ftypes2files(
+;
+DROP TABLE IF EXISTS ftypes2files;
+CREATE TABLE ftypes2files(
     id integer primary key autoincrement,
     file_id int not null references files(id) on delete cascade,
     ftype_id int not null references file_types(id) on delete cascade,
     unique(file_id, ftype_id)
 );
-
-
--- Creators, Contributors --
-
-drop table if exists creators;
-create table creators(
+;
+DROP TABLE IF EXISTS creators;
+CREATE TABLE creators(
     id integer primary key autoincrement,
     name varchar(255) not null unique
 );
-
-drop table if exists creators2books;
-create table creators2books(
+;
+DROP TABLE IF EXISTS creators2books;
+CREATE TABLE creators2books(
     id integer primary key autoincrement,
     book_id int not null references books(id) on delete cascade,
     creator_id int not null references creators(id) on delete cascade,
     unique(book_id, creator_id)
 );
-
-drop table if exists contributors;
-create table contributors(
+;
+DROP TABLE IF EXISTS contributors;
+CREATE TABLE contributors(
     id integer primary key autoincrement,
     name varchar(255) unique
 );
-
-drop table if exists contributors2books;
-create table contributors2books(
+;
+DROP TABLE IF EXISTS contributors2books;
+CREATE TABLE contributors2books(
     id integer primary key autoincrement,
     book_id int not null references books(id) on delete cascade,
     contributor_id int not null references contributors(id) on delete cascade,
     role varchar(16),
     unique(book_id, contributor_id, role)
 );
-
-drop index if exists contributors_roles;
-create index if not exists contributors_roles on contributors2books(role, contributor_id);
-
--- Subjects (categories) --
-
-drop table if exists lcc_subjects;
-create table lcc_subjects(
+;
+DROP TABLE IF EXISTS lcc_subjects;
+CREATE TABLE lcc_subjects(
     id integer primary key autoincrement,
     name varchar(16) unique
 );
-
-drop table if exists lcc2books;
-create table lcc2books(
+;
+DROP TABLE IF EXISTS lcc2books;
+CREATE TABLE lcc2books(
     id integer primary key autoincrement,
     book_id int not null references books(id) on delete cascade,
     lcc_id int not null references lcc_subjects(id) on delete cascade,
     unique(book_id, lcc_id)
 );
-
-drop table if exists lcsh_subjects;
-create table lcsh_subjects(
+;
+DROP TABLE IF EXISTS lcsh_subjects;
+CREATE TABLE lcsh_subjects(
     id integer primary key autoincrement,
     name text not null unique
 );
-
-drop table if exists lcsh2books;
-create table lcsh2books(
+;
+DROP TABLE IF EXISTS lcsh2books;
+CREATE TABLE lcsh2books(
     id integer primary key autoincrement,
     book_id int not null references books(id) on delete cascade,
     lcsh_id int not null references lcsh_subjects(id) on delete cascade,
     unique(book_id, lcsh_id)
 );
+
+
+
+DROP INDEX IF EXISTS books_created;
+CREATE INDEX books_created on books(created);
+DROP INDEX IF EXISTS books_rights;
+CREATE INDEX books_rights on books(rights);
+DROP INDEX IF EXISTS files_modified;
+CREATE INDEX files_modified on files(modified);
+DROP INDEX IF EXISTS files_charset;
+CREATE INDEX files_charset on files(charset);
+DROP INDEX IF EXISTS contributors_roles;
+CREATE INDEX contributors_roles on contributors2books(role, contributor_id);
+DROP INDEX IF EXISTS file_type;
+CREATE UNIQUE INDEX file_type on ftypes2files (file_id ASC, ftype_id ASC);
+DROP INDEX IF EXISTS file_etext_id;
+CREATE INDEX file_etext_id on files (etext_id ASC);
+DROP INDEX IF EXISTS book_etext_id;
+CREATE UNIQUE INDEX book_etext_id on books (etext_id ASC);
+DROP INDEX IF EXISTS creators2books_ids;
+CREATE UNIQUE INDEX creators2books_ids on creators2books (book_id ASC, creator_id ASC);
+DROP INDEX IF EXISTS creator_name;
+CREATE INDEX creator_name on creators (name ASC);
+
+DROP VIEW IF EXISTS quick_list;
+CREATE VIEW quick_list AS select books.*, 
+	language2book.language,
+	creators.name as creator,
+	file_types.name as file_type,
+	files.charset as file_encoding,
+	files.url as file_url,
+    files.modified as file_modified
+from 
+	books, language2book,
+	files, ftypes2files, file_types,
+	creators, creators2books
+where
+	books.id=language2book.book_id
+	and files.etext_id=books.etext_id
+	and files.id=ftypes2files.file_id
+	and ftypes2files.ftype_id=file_types.id
+	and creators2books.book_id=books.id
+	and creators.id=creators2books.creator_id;
