@@ -30,26 +30,24 @@ for each (var fname in fs.list(jar_dir)) {
     addToClasspath(jar_dir + fname);
 }
 
+var config = require("config");
+
 
 // --- Main: ---
 
 exports.run = function() {
     
-    // paths:
-    var data_dir = module.directory + "/data";
-    var catalog_file = data_dir + "/catalog.rdf";
-    var db = data_dir + "/catalog.sqlite";
-
     // vars:
     var parser = require("ctl/sax_parser");
-    var gutenberg_handler = require("gutenberg_handler");
+    var gutenberg_handler = require("ctl/gutenberg.org/catalog/rdf-handler");
 
     // parse:
     parser.setContentHandler(gutenberg_handler);
-    parser.setFileName(catalog_file);
-    parser.parse();
+    parser.setFileName(config.gutenberg.catalog_rdf);
 
-    print("Parsing finished.");
+    print("Parsing started.", new Date());
+    parser.parse();
+    print("Parsing finished.", new Date());
 }
 
 exports.header = function() {
@@ -62,7 +60,5 @@ exports.header = function() {
 
 if (require.main == module) {
     exports.header();
-    print(new Date());
     exports.run();
-    print(new Date());
 }

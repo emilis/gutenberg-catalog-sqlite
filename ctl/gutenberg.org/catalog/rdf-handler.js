@@ -18,7 +18,7 @@
 */
 
 
-var dbtables = require("dbtables");
+var dbtables = require("./sqlite-tables");
 
 var cache = {
     multimedia_types: {},
