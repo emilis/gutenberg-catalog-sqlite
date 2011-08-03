@@ -26,7 +26,7 @@ var serializable = require("ctl/objectfs/serializable");
 
 
 // Connect to DB:
-db.connect(config.DATA_DIR + "/catalog.sqlite");
+db.connect(config.DB.GutenbergCatalog);
 
 
 exports.begin_trans = function() {
@@ -74,7 +74,8 @@ var tables = [
     "lcc_subjects",
     "lcc2books",
     "lcsh_subjects",
-    "lcsh2books"];
+    "lcsh2books",
+    "quick_list"];
 
 for each (var t in tables) {
     exports[t] = connect_table(t);
@@ -118,6 +119,75 @@ exports.books = connect_table("books", {
         }
 
         return data;
+    },
+
+    readFull: function(id) {
+
+        var book = this.read(id);
+
+        if (!book) {
+            return false;
+        }
+
+        if (book.mtype_id) {
+            book.mtype = exports.multimedia_types.read(book.mtype_id);
+        } else {
+            book.mtype = null;
+        }
+
+        book.languages = exports.language2book
+            .list({book_id:id})
+            .map(function(row) { return row.language; });
+
+
+        book.files = exports.files
+            .list({ etext_id: book.etext_id })
+            .map(function(file) {
+                    file.types = exports.file_types.list({
+                        id: exports.ftypes2files
+                            .list({ file_id: file.id })
+                            .map(function (row) { return row.ftype_id; })
+                    });
+                    return file;
+                }
+            );
+
+
+        book.creators = exports.creators.list({
+            id: exports.creators2books
+                    .list({book_id:id})
+                    .map(function (row) { return row.creator_id ;})
+            }
+        );
+
+        book.contributors = exports.contributors.list({
+            id: exports.contributors2books
+                    .list({book_id:id})
+                    .map(function(row) { return row.contributor_id; })
+            }
+        );
+
+        book.subjects = {
+            lcc: [],
+            lcsh: []
+        };
+
+        book.subjects.lcc = exports.lcc_subjects.list({
+            id: exports.lcc2books
+                    .list({book_id:id})
+                    .map(function(row) { return row.lcc_id; })
+            }
+        );
+
+        book.subjects.lcsh = exports.lcsh_subjects.list({
+            id: exports.lcsh2books
+                    .list({book_id:id})
+                    .map(function(row) { return row.lcsh_id; })
+            }
+        );
+
+        return book;
+
     }
 
 });
