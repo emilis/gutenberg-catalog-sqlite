@@ -54,10 +54,9 @@ exports.run = function() {
 
 exports.header = function() {
 
-    ["Gutenberg Catalog Converter to Sqlite  Copyright (C) 2011 Emilis Dambauskas",
-        "This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE.txt.",
-        "This is free software, and you are welcome to redistribute it under certain conditions; see LICENSE.txt for details."
-    ].map(print);
+    print("Gutenberg Catalog Converter to Sqlite  Copyright (C) 2011 Emilis Dambauskas");
+    print("This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE.txt.");
+    print("This is free software, and you are welcome to redistribute it under certain conditions; see LICENSE.txt for details.");
 }
 
 
