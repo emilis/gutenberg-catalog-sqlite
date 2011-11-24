@@ -325,10 +325,14 @@ exports.endString = function(str) {
     case "/rdf:RDF/pgterms:etext/dc:creator":
     case "/rdf:RDF/pgterms:etext/dc:creator/rdf:Bag/rdf:li":
 
-        dbtables.creators2books.write(false, {
-                book_id: this.book.id,
-                creator_id: loadIdByName("creators", str)
-        });
+        try {
+            dbtables.creators2books.write(false, {
+                    book_id: this.book.id,
+                    creator_id: loadIdByName("creators", str)
+            });
+        } catch (e) {
+            print(e);
+        }
         break;
 
 
